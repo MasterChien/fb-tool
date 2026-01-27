@@ -1,0 +1,55 @@
+# Cookies and sensitive data
+*.cookies.json
+*_cookies.json
+www_facebook_com_cookies.json
+
+# Results
+results/
+*.json
+!package.json
+!package-lock.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Debug screenshots
+debug_screenshot_*.png
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
