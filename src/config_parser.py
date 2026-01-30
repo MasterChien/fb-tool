@@ -49,6 +49,7 @@ class ScanConfig:
     groups: list[str]
     keywords: list[str]
     headless: bool = True  # Default headless for large batches
+    extract_links: bool = False  # Extract post links by clicking (slower)
 
     def get_keyword_groups(self) -> list[tuple[str, list[str]]]:
         """Gom nhóm keywords theo tiền tố. Returns [(search_term, [k1, k2, ...]), ...]"""
@@ -84,6 +85,7 @@ class ScanConfig:
             f"  browsers: {self.number_of_browser}\n"
             f"  scrolls: {self.scrolls}\n"
             f"  headless: {self.headless}\n"
+            f"  extract_links: {self.extract_links}\n"
             f"  groups: {len(self.groups)} groups\n"
             f"  keywords: {len(self.keywords)} (gom thanh {len(grouped)} search term)\n"
             f"  total searches: {total_searches} (thay vi {len(self.groups) * len(self.keywords)})\n"
@@ -175,10 +177,17 @@ def parse_config(config_file: str = "config.txt") -> ScanConfig:
         headless_val = config_data["headless"].lower()
         headless = headless_val in ("true", "1", "yes", "on")
     
+    # Parse extract_links option (default: false as it's slower)
+    extract_links = False
+    if "extract_links" in config_data:
+        extract_links_val = config_data["extract_links"].lower()
+        extract_links = extract_links_val in ("true", "1", "yes", "on")
+    
     return ScanConfig(
         number_of_browser=number_of_browser,
         scrolls=scrolls,
         groups=groups,
         keywords=keywords,
-        headless=headless
+        headless=headless,
+        extract_links=extract_links
     )

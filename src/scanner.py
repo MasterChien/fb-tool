@@ -8,7 +8,7 @@ from playwright.async_api import Page
 from rich.console import Console
 
 from .config import DEFAULT_SCROLL_DELAY, EMPTY_SCROLL_LIMIT, DEFAULT_MAX_SCROLLS
-from .extractor import extract_posts, expand_all_posts, check_end_of_results
+from .extractor import extract_posts, expand_all_posts, check_end_of_results, extract_post_links_by_click
 from .utils import extract_snippet
 
 console = Console(force_terminal=True)
@@ -33,7 +33,8 @@ async def scroll_and_collect_posts(
     search_term: str,
     keyword_list: list[str] | None = None,
     max_scrolls: int | None = None,
-    scroll_delay: float = DEFAULT_SCROLL_DELAY
+    scroll_delay: float = DEFAULT_SCROLL_DELAY,
+    extract_links_by_click: bool = False
 ) -> list[dict]:
     """
     Scroll page và thu thập post. Search trên FB bằng search_term; mỗi post
@@ -146,4 +147,11 @@ async def scroll_and_collect_posts(
                 await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 await asyncio.sleep(3)
 
+    # Extract links by clicking if enabled and there are posts without links
+    if extract_links_by_click and posts_found:
+        posts_without_links = [p for p in posts_found if not p.get('link')]
+        if posts_without_links:
+            console.print(f"\n[cyan]Dang lay link bang click cho {len(posts_without_links)} posts...[/cyan]")
+            posts_found = await extract_post_links_by_click(page, posts_found)
+    
     return posts_found

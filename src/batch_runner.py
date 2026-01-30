@@ -24,7 +24,8 @@ async def scan_with_page(
     group_id: str,
     search_term: str,
     keyword_list: list[str],
-    max_scrolls: int
+    max_scrolls: int,
+    extract_links: bool = False
 ) -> dict:
     """
     Scan một cặp (group, search_term) với danh sách keyword cùng tiền tố.
@@ -47,7 +48,8 @@ async def scan_with_page(
             return result
         
         posts = await scroll_and_collect_posts(
-            page, search_term=search_term, keyword_list=keyword_list, max_scrolls=max_scrolls
+            page, search_term=search_term, keyword_list=keyword_list, max_scrolls=max_scrolls,
+            extract_links_by_click=extract_links
         )
         result["success"] = True
         
@@ -83,7 +85,8 @@ async def worker(
     cookie_file: str,
     max_scrolls: int,
     headless: bool,
-    results: list
+    results: list,
+    extract_links: bool = False
 ):
     """
     Worker that processes pairs from queue - REUSES browser for multiple pairs
@@ -95,6 +98,7 @@ async def worker(
         max_scrolls: Maximum scrolls
         headless: Run headless
         results: List to store results
+        extract_links: Extract post links by clicking (slower)
     """
     browser = None
     playwright = None
@@ -138,7 +142,8 @@ async def worker(
                 group_id=group_id,
                 search_term=search_term,
                 keyword_list=keyword_list,
-                max_scrolls=max_scrolls
+                max_scrolls=max_scrolls,
+                extract_links=extract_links
             )
 
             results.append(result)
@@ -191,6 +196,7 @@ async def run_batch(
     console.print(f"\n[cyan]Configuration:[/cyan]")
     console.print(f"  Concurrent browsers: {config.number_of_browser}")
     console.print(f"  Max scrolls per search: {config.scrolls}")
+    console.print(f"  Extract links by click: {config.extract_links}")
     console.print(f"  Groups: {len(config.groups)}")
     console.print(f"  Keywords (gom nhom): {config.get_keyword_groups()}")
     console.print(f"  Total searches (group x search_term): {total_pairs}")
@@ -220,7 +226,8 @@ async def run_batch(
                 cookie_file=cookie_file,
                 max_scrolls=config.scrolls,
                 headless=headless,
-                results=results
+                results=results,
+                extract_links=config.extract_links
             )
         )
         workers.append(worker_task)
