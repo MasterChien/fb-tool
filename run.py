@@ -1,15 +1,3 @@
-#!/usr/bin/env python
-"""
-Facebook Group Keyword Scanner
-
-Reads configuration from config.txt and scans Facebook groups for keywords.
-
-Config format (config.txt):
-    number_of_browsers=3
-    scrolls=30
-    groups=group1, group2
-    keywords=keyword1, keyword2
-"""
 
 import sys
 import os
@@ -40,11 +28,11 @@ def main():
         console.print(f"[green]Config loaded successfully[/green]")
         console.print(str(config))
         
-        # Run batch
+        # Run batch (use headless setting from config)
         asyncio.run(run_batch(
             config=config,
             cookie_file="www_facebook_com_cookies.json",
-            headless=False
+            headless=config.headless
         ))
         
     except FileNotFoundError as e:

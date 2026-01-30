@@ -1,4 +1,13 @@
+# Facebook Group Keyword Scanner Config
+# ======================================
+
 number_of_browsers=
-scrolls=
+
+scrolls=500
+
+headless=true
+
 groups=
+
+# Keywords, separate by comma ","
 keywords=

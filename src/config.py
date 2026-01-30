@@ -22,8 +22,13 @@ LOCALE = 'vi-VN'
 
 # Scroll settings
 DEFAULT_SCROLL_DELAY = 2.0
-DEFAULT_MAX_SCROLLS = 100
-MAX_NO_NEW_POSTS = 5
+# Safety limit: max scrolls per search (tránh loop vô hạn)
+DEFAULT_MAX_SCROLLS = 500
+# Dừng khi liên tiếp N lần scroll không có post mới
+EMPTY_SCROLL_LIMIT = 3
+
+# Rate limiting - delay between different group/keyword pairs (seconds)
+DELAY_BETWEEN_PAIRS = 3
 
 # Text patterns to skip (UI elements)
 SKIP_PATTERNS = [

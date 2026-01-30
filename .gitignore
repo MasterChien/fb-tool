@@ -1,6 +1,8 @@
 # Cookies and sensitive data
 *.cookies.json
 *_cookies.json
+config.txt
+db_config.txt
 www_facebook_com_cookies.json
 
 # Results

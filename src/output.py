@@ -142,34 +142,35 @@ def save_consolidated_results(all_results: list[dict], output_file: str = None) 
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         output_file = os.path.join(OUTPUT_DIR, f"all_results_{timestamp}.json")
     
-    # Flatten all posts into a single list
+    # Flatten: hỗ trợ cả result có "posts" (cũ) và "keyword_posts" (gom nhóm keyword)
     all_posts = []
     groups_scanned = set()
     keywords_scanned = set()
     
     for result in all_results:
         group_id = result.get("group_id", "")
-        keyword = result.get("keyword", "")
-        posts = result.get("posts", [])
-        
         groups_scanned.add(group_id)
-        keywords_scanned.add(keyword)
         
-        # Enrich and add posts
-        for post in posts:
-            enriched_post = {
-                "group_id": group_id,
-                "keyword": keyword,
-                **post
-            }
-            all_posts.append(enriched_post)
+        keyword_posts = result.get("keyword_posts", {})
+        if keyword_posts:
+            for keyword, posts in keyword_posts.items():
+                keywords_scanned.add(keyword)
+                for post in posts:
+                    enriched_post = {"group_id": group_id, "keyword": keyword, **post}
+                    all_posts.append(enriched_post)
+        else:
+            keyword = result.get("keyword", "")
+            posts = result.get("posts", [])
+            keywords_scanned.add(keyword)
+            for post in posts:
+                enriched_post = {"group_id": group_id, "keyword": keyword, **post}
+                all_posts.append(enriched_post)
     
-    # Create consolidated result
     consolidated = {
         "scan_time": datetime.now().isoformat(),
         "summary": {
             "total_posts": len(all_posts),
-            "total_pairs_scanned": len(all_results),
+            "total_searches": len(all_results),
             "groups_scanned": sorted(list(groups_scanned)),
             "keywords_scanned": sorted(list(keywords_scanned))
         },

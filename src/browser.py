@@ -142,12 +142,40 @@ async def navigate_to_group_search(page: Page, group_id: str, keyword: str) -> b
         search_url = f"https://www.facebook.com/groups/{group_id}/search/?q={quote(keyword)}"
         console.print(f"[cyan]>[/cyan] Dang tim kiem '{keyword}'...")
         await page.goto(search_url, wait_until='domcontentloaded', timeout=60000)
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
         
-        # Save debug screenshot
-        screenshot_path = f"debug_screenshot_{group_id}.png"
-        await page.screenshot(path=screenshot_path)
-        console.print(f"[dim]Debug: Da luu screenshot vao {screenshot_path}[/dim]")
+        # Click "Bài viết mới đây" (Recent posts) filter
+        try:
+            recent_filter_clicked = await page.evaluate("""
+                () => {
+                    const filterTexts = ['Bài viết mới đây', 'Recent posts', 'Most recent'];
+                    const allSpans = document.querySelectorAll('span');
+                    for (const span of allSpans) {
+                        const text = span.innerText?.trim() || '';
+                        for (const filterText of filterTexts) {
+                            if (text === filterText || text.includes(filterText)) {
+                                // Find clickable parent
+                                let el = span;
+                                for (let i = 0; i < 5 && el; i++) {
+                                    if (el.click) {
+                                        el.click();
+                                        return true;
+                                    }
+                                    el = el.parentElement;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                }
+            """)
+            if recent_filter_clicked:
+                console.print(f"[green][OK][/green] Da chon 'Bai viet moi day'")
+                await asyncio.sleep(3)
+            else:
+                console.print(f"[dim]Khong tim thay filter 'Bai viet moi day'[/dim]")
+        except Exception as e:
+            console.print(f"[dim]Loi khi chon filter: {e}[/dim]")
         
         return True
         
